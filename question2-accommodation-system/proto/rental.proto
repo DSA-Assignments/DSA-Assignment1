@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package rental;
+
+service RentalService {
+  rpc addProperty (Property) returns (PropertyId);
+  rpc updateProperty (UpdatePropertyRequest) returns (Property);
+  rpc removeProperty (PropertyId) returns (PropertyList);
+  rpc createUsers (stream UserProfile) returns (UserCreationSummary);
+  rpc listAvailableProperties (ListFilter) returns (stream Property);
+  rpc searchProperty (PropertyId) returns (SearchResult);
+  rpc bookProperty (BookingRequest) returns (BookingCartResult);
+  rpc confirmBooking (PropertyId) returns (BookingConfirmation);
+}
+
+message Property {
+  string propertyId = 1;
+  string name = 2;
+  string location = 3;
+  string propertyType = 4;
+  double pricePerNight = 5;
+  string status = 6;       // AVAILABLE, BOOKED
+  string hostId = 7;
+}
+
+message PropertyId {
+  string propertyId = 1;
+}
+
+message UpdatePropertyRequest {
+  string propertyId = 1;
+  double pricePerNight = 2;
+  string status = 3;
+}
+
+message PropertyList {
+  repeated Property properties = 1;
+}
+
+message UserProfile {
+  string userId = 1;
+  string name = 2;
+  string role = 3;          // HOST or GUEST
+}
+
+message UserCreationSummary {
+  int32 usersCreated = 1;
+}
+
+message ListFilter {
+  string location = 1;
+  double maxPrice = 2;
+}
+
+message SearchResult {
+  bool available = 1;
+  Property property = 2;
+  string status = 3;        // FOUND or NOT_AVAILABLE
+}
+
+message BookingRequest {
+  string propertyId = 1;
+  string guestId = 2;
+  string checkIn = 3;       // YYYY-MM-DD
+  string checkOut = 4;      // YYYY-MM-DD
+}
+
+message BookingCartResult {
+  bool accepted = 1;
+  string message = 2;
+}
+
+message BookingConfirmation {
+  bool confirmed = 1;
+  double totalCost = 2;
+  string message = 3;
+}

@@ -1,0 +1,14 @@
+# Ballerina build output
+target/
+generated/
+*.jar
+
+# Ballerina local config/secrets
+Config.toml
+
+# Editor / OS files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

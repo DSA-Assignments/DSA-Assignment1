@@ -1,0 +1,5 @@
+[package]
+org = "DSA"
+name = "rental_server"
+version = "0.1.0"
+distribubtion = "2201.9.0"
