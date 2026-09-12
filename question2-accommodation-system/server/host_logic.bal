@@ -1,149 +1,150 @@
-public type Host record {|
-    string id;
+import ballerina/uuid;
+
+// Task 6: Host-side server logic.
+
+// This module owns `propertyTable` (writes) and `userTable` (owns fully).
+// guest_logic.bal (Task 7) only ever reads `propertyTable`.
+
+public type UserProfile record {|
+    string userId;
     string name;
-    string email;
-    string phone;
-    string[] accommodationIds = [];
+    string role; // HOST or GUEST
 |};
 
-public type Accommodation record {|
-    string id;
-    string title;
+isolated map<UserProfile> userTable = {}; // keyed by userId
+
+// ==================== add_property ====================
+
+// Mirrors the proto Property message. propertyId may arrive blank from the
+// client (as in client.bal's example) — the server assigns one in that case.
+public type NewPropertyInput record {|
+    string propertyId;
+    string name;
     string location;
-    int capacity;
+    string propertyType;
     decimal pricePerNight;
-    boolean isAvailable = true;
+    string status;
     string hostId;
 |};
 
-public type Booking record {|
-    string id;
-    string accommodationId;
-    string guestName;
-    string guestEmail;
-    string checkIn;
-    string checkOut;
+public isolated function addProperty(NewPropertyInput input) returns string|error {
+    if input.hostId.trim() == "" {
+        return error("hostId is required.");
+    }
+    if input.pricePerNight <= 0d {
+        return error("pricePerNight must be positive.");
+    }
+
+    string propertyId = input.propertyId.trim();
+    if propertyId == "" {
+        propertyId = uuid:createType1AsString();
+    }
+
+    string status = input.status.trim() == "" ? "AVAILABLE" : input.status;
+
+    lock {
+        if propertyTable.hasKey(propertyId) {
+            return error("Property id already exists: " + propertyId);
+        }
+        Property newProperty = {
+            propertyId,
+            name: input.name,
+            location: input.location,
+            propertyType: input.propertyType,
+            pricePerNight: input.pricePerNight,
+            status,
+            hostId: input.hostId
+        };
+        propertyTable.add(newProperty.clone());
+    }
+    return propertyId;
+}
+
+// ==================== update_property ====================
+// Matches proto UpdatePropertyRequest: only price and status are mutable
+// through this RPC.
+
+public type UpdatePropertyInput record {|
+    string propertyId;
+    decimal pricePerNight;
+    string status;
 |};
 
-public class HostLogic {
-    private map<Host> hosts = {};
-    private map<Accommodation> accommodations = {};
-    private map<Booking[]> bookingsByAccommodation = {};
+public isolated function updateProperty(UpdatePropertyInput input) returns Property|error {
+    lock {
+        if !propertyTable.hasKey(input.propertyId) {
+            return error("Property not found: " + input.propertyId);
+        }
+        Property p = propertyTable.get(input.propertyId);
 
-    public function registerHost(Host host) returns Host|error {
-        if host.id == "" || host.name == "" {
-            return error("Host id and name are required.");
+        if input.pricePerNight > 0d {
+            p.pricePerNight = input.pricePerNight;
+        }
+        if input.status.trim() != "" {
+            p.status = input.status;
         }
 
-        if self.hosts.hasKey(host.id) {
-            return error("Host already exists: " + host.id);
-        }
-
-        self.hosts[host.id] = host;
-        return host;
-    }
-
-    public function getHost(string hostId) returns Host? {
-        return self.hosts[hostId];
-    }
-
-    public function addAccommodation(string hostId, Accommodation accommodation) returns Accommodation|error {
-        if !self.hosts.hasKey(hostId) {
-            return error("Unknown host: " + hostId);
-        }
-
-        if accommodation.id == "" {
-            return error("Accommodation id is required.");
-        }
-
-        if self.accommodations.hasKey(accommodation.id) {
-            return error("Accommodation already exists: " + accommodation.id);
-        }
-
-        accommodation.hostId = hostId;
-        self.accommodations[accommodation.id] = accommodation;
-
-        Host host = self.hosts.get(hostId);
-        host.accommodationIds.push(accommodation.id);
-        self.hosts[hostId] = host;
-        self.bookingsByAccommodation[accommodation.id] = [];
-
-        return accommodation;
-    }
-
-    public function listAccommodations(string hostId) returns Accommodation[]|error {
-        if !self.hosts.hasKey(hostId) {
-            return error("Unknown host: " + hostId);
-        }
-
-        Host host = self.hosts.get(hostId);
-        Accommodation[] result = [];
-
-        foreach string accommodationId in host.accommodationIds {
-            Accommodation? accommodation = self.accommodations[accommodationId];
-            if accommodation is Accommodation {
-                result.push(accommodation);
-            }
-        }
-
-        return result;
-    }
-
-    public function updateAvailability(string accommodationId, boolean isAvailable) returns Accommodation|error {
-        Accommodation? accommodation = self.accommodations[accommodationId];
-        if accommodation is () {
-            return error("Accommodation not found: " + accommodationId);
-        }
-
-        accommodation.isAvailable = isAvailable;
-        self.accommodations[accommodationId] = accommodation;
-        return accommodation;
-    }
-
-    public function createBooking(string accommodationId, Booking booking) returns Booking|error {
-        Accommodation? accommodation = self.accommodations[accommodationId];
-        if accommodation is () {
-            return error("Accommodation not found: " + accommodationId);
-        }
-
-        if !accommodation.isAvailable {
-            return error("Accommodation is not available for booking.");
-        }
-
-        if booking.id == "" {
-            return error("Booking id is required.");
-        }
-
-        Booking[] existingBookings = self.bookingsByAccommodation.hasKey(accommodationId)
-            ? self.bookingsByAccommodation.get(accommodationId)
-            : [];
-
-        foreach Booking existingBooking in existingBookings {
-            if existingBooking.id == booking.id {
-                return error("Booking already exists: " + booking.id);
-            }
-        }
-
-        existingBookings.push(booking);
-        self.bookingsByAccommodation[accommodationId] = existingBookings;
-
-        accommodation.isAvailable = false;
-        self.accommodations[accommodationId] = accommodation;
-
-        return booking;
-    }
-
-    public function getBookings(string accommodationId) returns Booking[]|error {
-        if !self.accommodations.hasKey(accommodationId) {
-            return error("Accommodation not found: " + accommodationId);
-        }
-
-        return self.bookingsByAccommodation.hasKey(accommodationId)
-            ? self.bookingsByAccommodation.get(accommodationId)
-            : [];
+        propertyTable.put(p);
+        return p.clone();
     }
 }
 
-public function createHostLogic() returns HostLogic {
-    return new HostLogic();
+// ==================== remove_property ====================
+// The proto's PropertyList response and client.bal's "Remaining properties
+// for this host" comment imply the response lists the *removed property's
+// host's* other listings, not the whole table.
+
+public isolated function removeProperty(string propertyId) returns Property[]|error {
+    lock {
+        if !propertyTable.hasKey(propertyId) {
+            return error("Property not found: " + propertyId);
+        }
+        Property removed = propertyTable.get(propertyId);
+        _ = propertyTable.remove(propertyId);
+
+        return from Property p in propertyTable
+            where p.hostId == removed.hostId
+            select p.clone();
+    }
+}
+
+// ==================== create_users (client-streaming) ====================
+// The client streams UserProfile messages one at a time and then closes the
+// stream, expecting a single UserCreationSummary back. registerUser() below
+// is meant to be called once per message as it arrives off the wire;
+// createUsers() is a batch convenience wrapper (handy for unit tests, and
+// usable directly if the generated skeleton hands back the whole message
+// list rather than calling back per-message — see wiring notes below).
+
+public isolated function registerUser(UserProfile profile) returns error? {
+    if profile.userId.trim() == "" {
+        return error("userId is required.");
+    }
+    if profile.role != "HOST" && profile.role != "GUEST" {
+        return error("Invalid role for user '" + profile.userId + "': " + profile.role);
+    }
+    lock {
+        userTable[profile.userId] = profile.clone();
+    }
+}
+
+public type UserCreationOutcome record {|
+    int usersCreated;
+|};
+
+public isolated function createUsers(UserProfile[] profiles) returns UserCreationOutcome {
+    int created = 0;
+    foreach UserProfile profile in profiles {
+        error? result = registerUser(profile);
+        if result is () {
+            created += 1;
+        }
+    }
+    return { usersCreated: created };
+}
+
+public isolated function totalUsers() returns int {
+    lock {
+        return userTable.length();
+    }
 }
