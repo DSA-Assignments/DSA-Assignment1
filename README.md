@@ -97,4 +97,4 @@ Pull before you start each session:
 
 to stay in sync, since 8 people are touching the same repo.
 
-Whoever owns Setup & Data (Person 1) and Proto & Setup (Person 5) should merge their branches into main first — everyone else's git pull after that gives them the shared models/proto to build on.
+Whoever owns Setup & Data (Person 1) and Proto & Setup (Person 5) should merge their branches into main first — everyone else's git pull after that gives them the shared models/proto to build on.  
