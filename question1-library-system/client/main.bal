@@ -70,7 +70,7 @@ function campusView() returns error? {
 
     json assets = check libraryClient->get(path);
     io:println(assets.toJsonString());
-}
+} 
 
 function overdueDashboard() returns error? {
     // Assumes GET /library/assets/overdue — built by Person 3.
