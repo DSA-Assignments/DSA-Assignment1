@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f3f0;
+            color: #2c2c2c;
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 4px solid #c9a96e;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1600') center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        header .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        header h1 i {
+            color: #c9a96e;
+            margin-right: 12px;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: #f5f3f0;
+            color: #1a1a2e;
+        }
+
+        .tab-btn.active {
+            background: #1a1a2e;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(26,26,46,0.3);
+        }
+
+        .tab-btn i {
+            font-size: 1rem;
+        }
+
+        /* ===== TAB CONTENT ===== */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #eee;
+        }
+
+        .card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 i {
+            color: #c9a96e;
+        }
+
+        /* ===== FORM ===== */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #444;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: border 0.2s ease;
+            background: #fafafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #c9a96e;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #16213e;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26,26,46,0.3);
+        }
+
+        .btn-gold {
+            background: #c9a96e;
+            color: #fff;
+        }
+
+        .btn-gold:hover {
+            background: #b8944f;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(201,169,110,0.4);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+
+        /* ===== ASSET GRID ===== */
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .asset-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #eee;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .asset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .asset-card-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asset-card-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .asset-card-header .tag {
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 400;
+        }
+
+        .asset-card-body {
+            padding: 16px 20px;
+        }
+
+        .asset-card-body p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .asset-card-body p i {
+            color: #c9a96e;
+            width: 16px;
+            font-size: 0.8rem;
+        }
+
+        .asset-card-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-available {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-loaned {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-occupied {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-maintenance {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .status-disposed {
+            background: #eceff1;
+            color: #546e7a;
+        }
+
+        /* ===== OVERDUE LIST ===== */
+        .overdue-item {
+            background: #fff;
+            border-left: 4px solid #e74c3c;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .overdue-item h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .overdue-item p {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .overdue-item .due-date {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-success {
+            background: #2e7d32;
+        }
+
+        .toast-error {
+            background: #c62828;
+        }
+
+        .toast-info {
+            background: #1565c0;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: #ddd;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading i {
+            font-size: 1.5rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            .tabs { flex-direction: column; }
+            .tab-btn { min-width: auto; }
+            .form-row { grid-template-columns: 1fr; }
+            .asset-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="header-content">
+            <h1><i class="fas fa-book-open"></i> Library Management System</h1>
+            <p>Ministry of Higher Education, Training and Innovations</p>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTAINER ===== -->
+    <div class="container">
+
+        <!-- ===== TABS ===== -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('view')">
+                <i class="fas fa-list"></i> View All
+            </button>
+            <button class="tab-btn" onclick="showTab('loan')">
+                <i class="fas fa-hand-holding"></i> Loan
+            </button>
+            <button class="tab-btn" onclick="showTab('book')">
+                <i class="fas fa-calendar-check"></i> Book Room
+            </button>
+            <button class="tab-btn" onclick="showTab('overdue')">
+                <i class="fas fa-exclamation-triangle"></i> Overdue
+            </button>
+            <button class="tab-btn" onclick="showTab('schedule')">
+                <i class="fas fa-clock"></i> Schedule
+            </button>
+            <button class="tab-btn" onclick="showTab('filter')">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+        </div>
+
+        <!-- ===== TAB: VIEW ALL ===== -->
+        <div id="tab-view" class="tab-content active">
+            <div class="card">
+                <h2><i class="fas fa-list"></i> All Assets</h2>
+                <button class="btn btn-primary" onclick="loadAllAssets()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+            <div id="all-assets" class="asset-grid">
+                <div class="loading"><i class="fas fa-spinner"></i> Loading...</div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: LOAN ===== -->
+        <div id="tab-loan" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-hand-holding"></i> Loan an Asset</h2>
+                <div class="form-group">
+                    <label>Asset Tag</label>
+                    <input type="text" id="loan-tag" placeholder="e.g., NUST-BOOK-001">
+                </div>
+                <button class="btn btn-gold" onclick="loanAsset()">
+                    <i class="fas fa-check"></i> Loan Asset
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== TAB: BOOK ROOM ===== -->
+        <div id="tab-book" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-calendar-check"></i> Book a Room/Lab</h2>
+                <div class="form-group">
+                    <label>Room/Lab Asset Tag</label>
+                    <input type="text" id="book-tag" placeholder="e.g., NUST-ROOM-001">
+                </div>
+                <button class="btn btn-gold" onclick="bookRoom()">
+                    <i class="fas fa-check"></i> Book Room
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== TAB: OVERDUE ===== -->
+        <div id="tab-overdue" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-exclamation-triangle"></i> Overdue Maintenance</h2>
+                <button class="btn btn-primary" onclick="loadOverdue()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+            <div id="overdue-list">
+                <div class="loading"><i class="fas fa-spinner"></i> Loading...</div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: SCHEDULE ===== -->
+        <div id="tab-schedule" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-clock"></i> Add a Schedule</h2>
+                <div class="form-group">
+                    <label>Asset Tag</label>
+                    <input type="text" id="schedule-tag" placeholder="e.g., NUST-ROOM-001">
+                </div>
+                <div class="form-group">
+                    <label>Schedule ID</label>
+                    <input type="text" id="schedule-id" placeholder="e.g., SCH-001">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="schedule-type">
+                            <option value="MAINTENANCE">Maintenance</option>
+                            <option value="BOOKING">Booking</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date (YYYY-MM-DD)</label>
+                        <input type="text" id="schedule-date" placeholder="2026-12-01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="schedule-desc" placeholder="e.g., Quarterly cleaning">
+                </div>
+                <button class="btn btn-gold" onclick="addSchedule()">
+                    <i class="fas fa-plus"></i> Add Schedule
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== TAB: FILTER ===== -->
+        <div id="tab-filter" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-filter"></i> Filter Assets</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>By Institution</label>
+                        <input type="text" id="filter-inst" placeholder="e.g., NUST">
+                    </div>
+                    <div class="form-group">
+                        <label>By Site</label>
+                        <input type="text" id="filter-site" placeholder="e.g., Main Campus">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="filterByInstitution()">
+                        <i class="fas fa-search"></i> Filter by Institution
+                    </button>
+                    <button class="btn btn-primary" onclick="filterBySite()">
+                        <i class="fas fa-search"></i> Filter by Site
+                    </button>
+                </div>
+            </div>
+            <div id="filter-results" class="asset-grid"></div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_URL = 'http://localhost:9090/library';
+
+        // ===== TAB SWITCHING =====
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'view') loadAllAssets();
+            if (tabName === 'overdue') loadOverdue();
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.className = 'toast toast-' + type;
+            toast.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ===== LOAD ALL ASSETS =====
+        async function loadAllAssets() {
+            const container = document.getElementById('all-assets');
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> Loading...</div>';
+            
+            try {
+                const response = await fetch(API_URL + '/assets');
+                const assets = await response.json();
+                
+                if (assets.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No assets found</p></div>';
+                    return;
+                }
+                
+                container.innerHTML = assets.map(asset => renderAssetCard(asset)).join('');
+            } catch (error) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Could not load assets. Is the API running?</p></div>';
+            }
+        }
+
+        // ===== RENDER ASSET CARD =====
+        function renderAssetCard(asset) {
+            const statusClass = getStatusClass(asset.assetStatus);
+            return `
+                <div class="asset-card">
+                    <div class="asset-card-header">
+                        <h3>${asset.name}</h3>
+                        <span class="tag">${asset.assetTag}</span>
+                    </div>
+                    <div class="asset-card-body">
+                        <p><i class="fas fa-align-left"></i> ${asset.description}</p>
+                        <p><i class="fas fa-university"></i> ${asset.institution}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${asset.site}</p>
+                        <p><i class="fas fa-calendar"></i> Acquired: ${asset.dateAcquired}</p>
+                    </div>
+                    <div class="asset-card-footer">
+                        <span class="status-badge ${statusClass}">${asset.assetStatus}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'AVAILABLE': return 'status-available';
+                case 'LOANED_OUT': return 'status-loaned';
+                case 'OCCUPIED': return 'status-occupied';
+                case 'UNDER_MAINTENANCE': return 'status-maintenance';
+                case 'DISPOSED': return 'status-disposed';
+                default: return 'status-available';
+            }
+        }
+
+        // ===== LOAN ASSET =====
+        async function loanAsset() {
+            const tag = document.getElementById('loan-tag').value.trim();
+            if (!tag) { showToast('Please enter an asset tag', 'error'); return; }
+            
+            try {
+                const getRes = await fetch(API_URL + '/assets/' + tag);
+                if (!getRes.ok) { showToast('Asset not found', 'error'); return; }
+                const asset = await getRes.json();
+                
+                asset.assetStatus = 'LOANED_OUT';
+                
+                const putRes = await fetch(API_URL + '/assets/' + tag, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(asset)
+                });
+                
+                if (putRes.ok) {
+                    showToast('Asset loaned successfully!', 'success');
+                    document.getElementById('loan-tag').value = '';
+                } else {
+                    showToast('Cannot loan this asset (already loaned or unavailable)', 'error');
+                }
+            } catch (error) {
+                showToast('Error connecting to API', 'error');
+            }
+        }
+
+        // ===== BOOK ROOM =====
+        async function bookRoom() {
+            const tag = document.getElementById('book-tag').value.trim();
+            if (!tag) { showToast('Please enter a room/lab tag', 'error'); return; }
+            
+            try {
+                const getRes = await fetch(API_URL + '/assets/' + tag);
+                if (!getRes.ok) { showToast('Asset not found', 'error'); return; }
+                const asset = await getRes.json();
+                
+                asset.assetStatus = 'OCCUPIED';
+                
+                const putRes = await fetch(API_URL + '/assets/' + tag, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(asset)
+                });
+                
+                if (putRes.ok) {
+                    showToast('Room booked successfully!', 'success');
+                    document.getElementById('book-tag').value = '';
+                } else {
+                    showToast('Cannot book this (not a room/lab, or already occupied)', 'error');
+                }
+            } catch (error) {
+                showToast('Error connecting to API', 'error');
+            }
+        }
+
+        // ===== LOAD OVERDUE =====
+        async function loadOverdue() {
+            const container = document.getElementById('overdue-list');
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> Loading...</div>';
+            
+            try {
+                const response = await fetch(API_URL + '/assets/overdue');
+                const overdue = await response.json();
+                
+                if (overdue.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No overdue items! Everything is up to date.</p></div>';
+                    return;
+                }
+                
+                container.innerHTML = overdue.map(item => `
+                    <div class="overdue-item">
+                        <h4>${item.name} (${item.assetTag})</h4>
+                        <p>${item.description}</p>
+                        <p class="due-date"><i class="fas fa-clock"></i> Due: ${item.dueDate}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Could not load overdue items</p></div>';
+            }
+        }
+
+        // ===== ADD SCHEDULE =====
+        async function addSchedule() {
+            const tag = document.getElementById('schedule-tag').value.trim();
+            const id = document.getElementById('schedule-id').value.trim();
+            const type = document.getElementById('schedule-type').value;
+            const date = document.getElementById('schedule-date').value.trim();
+            const desc = document.getElementById('schedule-desc').value.trim();
+            
+            if (!tag || !id || !date || !desc) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+            
+            const schedule = {
+                scheduleId: id,
+                scheduleType: type,
+                dueDate: date,
+                description: desc
+            };
+            
+            try {
+                const response = await fetch(API_URL + '/assets/' + tag + '/schedules', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(schedule)
+                });
+                
+                if (response.ok) {
+                    showToast('Schedule added successfully!', 'success');
+                    document.getElementById('schedule-tag').value = '';
+                    document.getElementById('schedule-id').value = '';
+                    document.getElementById('schedule-date').value = '';
+                    document.getElementById('schedule-desc').value = '';
+                } else {
+                    showToast('Invalid date format or asset not found', 'error');
+                }
+            } catch (error) {
+                showToast('Error connecting to API', 'error');
+            }
+        }
+
+        // ===== FILTER BY INSTITUTION =====
+        async function filterByInstitution() {
+            const inst = document.getElementById('filter-inst').value.trim();
+            if (!inst) { showToast('Enter an institution name', 'error'); return; }
+            
+            try {
+                const response = await fetch(API_URL + '/assets/institution/' + encodeURIComponent(inst));
+                const assets = await response.json();
+                renderFilterResults(assets, 'institution: ' + inst);
+            } catch (error) {
+                showToast('Error connecting to API', 'error');
+            }
+        }
+
+        // ===== FILTER BY SITE =====
+        async function filterBySite() {
+            const site = document.getElementById('filter-site').value.trim();
+            if (!site) { showToast('Enter a site name', 'error'); return; }
+            
+            try {
+                const response = await fetch(API_URL + '/assets/site/' + encodeURIComponent(site));
+                const assets = await response.json();
+                renderFilterResults(assets, 'site: ' + site);
+            } catch (error) {
+                showToast('Error connecting to API', 'error');
+            }
+        }
+
+        function renderFilterResults(assets, label) {
+            const container = document.getElementById('filter-results');
+            if (assets.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>No assets found for ' + label + '</p></div>';
+                return;
+            }
+            container.innerHTML = assets.map(asset => renderAssetCard(asset)).join('');
+        }
+
+        // ===== INITIAL LOAD =====
+        window.onload = () => {
+            loadAllAssets();
+        };
+    </script>
+
+</body>
+</html>
