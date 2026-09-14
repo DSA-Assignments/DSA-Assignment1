@@ -1,12 +1,17 @@
 # DSA-Assignment1
 
 Distributed Library & Rental Systems
-DSA612S — Distributed Systems and Applications, NUST Due: 14 Sept 2026, 23:59 · Team: 8
+DSA612S - Distributed Systems and Applications, NUST Due: 14 Sept 2026, 23:59 · Team: 8
+
 Two independent Ballerina systems in one repo:
-Q1 — Library & Resource Management System (REST) — 50 marks
-Q2 — Rental Accommodation System (gRPC) — 50 marks
+Q1 - Library & Resource Management System (REST) - 50 marks
+Q2 - Rental Accommodation System (gRPC) - 50 marks
+
+
 Tasks
-Q1: models & storage → asset CRUD → maintenance/schedules → work orders + CLI client Q2: .proto + skeleton → host logic (add/update/remove property, create_users) → guest logic (list/search/book/confirm) → gRPC client
+Q1: models & storage → asset CRUD → maintenance/schedules → work orders + CLI client 
+
+Q2: .proto + skeleton → host logic (add/update/remove property, create_users) → guest logic (list/search/book/confirm) → gRPC client
 Models (Q1) and proto (Q2) go first and merge to main first — everything else builds on them.
 
 Structure
